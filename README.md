@@ -1,6 +1,6 @@
 # The Unofficial Guide
 
-<!-- Replace this line with your name and which corpus you picked. -->
+**Name: ** Guanwen Wang **CORPUS: ** `city_guides` 
 
 > **This file is your submission.** Fill it in as you go — most sections get
 > written during the milestone that produces them, not at the end.
@@ -112,30 +112,40 @@ cards only.
 
 ## Sample Answer
 
-<!-- One complete question and answer, pasted as text, with the source line
-     visible. Milestone 4. -->
-
-**Question:**
+**Question:** What is the population of Elder Ness?
 
 **Answer:**
 
 ```
+The population of Elder Ness is 300, according to guide_elder_ness.md.
+
+Sources retrieved: guide_eating.md, guide_elder_ness.md
 ```
 
-**My relevance cutoff:**
+**My relevance cutoff:** 0.60
 
-<!-- The number you set in config.py, and how you got there.
-
-     You ran five questions your corpus covers and the five in OUT_OF_SCOPE
-     that it clearly doesn't, and wrote down the best distance for each. What
-     did those two groups look like? Where was the gap? Put the actual numbers
-     here — the table below wants all ten rows.
-
-     Milestone 4. -->
+I ran five questions my corpus covers and the five in OUT_OF_SCOPE that it 
+clearly doesn't, and wrote down the best distance for each. The two groups
+separated clearly with no overlap, the gap is between 0.458 - 0.758
 
 | Question | In corpus? | Best distance |
 |---|---|---|
-|  |  |  |
+| How often do trams run in Marchwood on weekdays? | yes | 0.288 |
+| Which town is easiest with limited mobility? | yes | 0.458 |
+| How long is the walk to the Elder Ness lighthouse? | yes | 0.255 |
+| What is the population of Elder Ness? | yes | 0.327 |
+| What time should you arrive at Halden Bay in August? | yes | 0.265 |
+| What is the capital of Mongolia? | no | 0.758 |
+| How do I change the oil in a diesel engine? | no | 0.923 |
+| Who won the 1994 World Cup? | no | 0.998 |
+| What is the recommended dosage of ibuprofen? | no | 0.792 |
+| How do I write a for loop in Rust? | no | 0.854 |
+
+The in-scope group ranged 0.255–0.458; the out-of-scope group ranged
+0.758–0.998. The gap is 0.300 wide. I kept the starter's cutoff of 0.60,
+which sits near the middle of the gap: 0.14 above the highest in-scope
+distance and 0.16 below the lowest out-of-scope distance. Every in-scope
+question passes; every out-of-scope question is refused.
 
 ## How I Used AI
 
