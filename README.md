@@ -1,6 +1,6 @@
 # The Unofficial Guide
 
-**Name: ** Guanwen Wang **CORPUS: ** `city_guides` 
+Name: Guanwen Wang Corpus: city_guides
 
 > **This file is your submission.** Fill it in as you go — most sections get
 > written during the milestone that produces them, not at the end.
@@ -21,11 +21,14 @@
 
 ## What This Does
 
-<!-- Three or four sentences. Which corpus you picked, and the kinds of
-     questions your system answers. Write it for someone who has never seen
-     this repo.
-
-     Milestone 5. -->
+This is a retrieval-augmented question answering system over a corpus of travel
+guides (`city_guides`), covering 14 towns. A user asks a question
+— for example, "How often do trams run in Marchwood on weekdays?" — and the
+system retrieves the most relevant chunks from the guides, checks that they
+are close enough to be useful, and generates an answer that cites the specific
+file and section it came from. Questions the corpus does not cover are refused
+with "I don't have enough information about that" rather than answered from the model's
+training data.
 
 ## Chunking Strategy
 
@@ -157,10 +160,29 @@ question passes; every out-of-scope question is refused.
      "I used AI to help me code" is not.
 
      Milestone 5. -->
+**1. Chunking strategy — from a generic suggestion to a corpus-specific one.**
 
-**1.**
+I asked Claude to suggest a chunking strategy. The first suggestion it gave me was generic: split
+on paragraph breaks. I read three of the actual documents and saw that every one
+of them is structured as a `#` title followed by multiple `##` sections,
+and that each `##` section is already a self-contained topic. So I
+changed the strategy with what I found. The result was
+98 chunks (was 51 under the starter) with an average length of 331
+characters, and the two previously broken chunks ("The station is a 15-"
+and a 24-character tail) both disappeared.
 
-**2.**
+**2. Relevance cutoff — using AI to analyse the gap, not to pick the number.**
+
+I ran all 5 in-scope and out-of-scope questions and recorded the best distances,
+then asked where the gap was and how to decide the cut-off.
+It showed me the in-scope group ranged 0.255–0.458 and the out-of-scope group
+0.758–0.998, with a 0.300-wide gap and no overlap. It suggested placing the cutoff near the midpoint
+(~0.608). I kept the starter's 0.60 instead, because it already sits in
+the middle of the gap, and keeping the starter value is itself
+evidence that my chunking strategy separated the two groups cleanly, and
+because a round number is easier to explain and reproduce than a fitted
+one. All five in-scope questions pass and all five out-of-scope questions
+are refused.
 
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
