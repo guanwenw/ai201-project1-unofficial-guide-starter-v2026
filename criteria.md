@@ -23,8 +23,13 @@ For at least 4 of my 5 test questions, the retrieved chunks include one that
 contains the answer.
 
 **Why this target:**
-<!-- e.g. "One of my questions is about a topic only two documents mention, so
-     I expect that one to be hard." -->
+One of my five questions — "What is the population of
+Elder Ness?" — depends on a single number that appears once in the whole
+corpus. If the chunk boundary falls badly, that number could end up in a
+chunk that retrieval doesn't return, even though the answer exists. The
+other four questions are anchored in short, self-contained sections, so
+4 of 5 is the honest target. 5 of 5 would be a claim I can't defend before
+seeing results.
 
 ---
 
@@ -33,8 +38,13 @@ contains the answer.
 Every answer the system produces names at least one source document.
 
 **Why this target:**
-<!-- Why all five and not four? What about your setup makes that achievable —
-     or what would have to go wrong for it not to be? -->
+Grounding is the whole point of the project — an answer
+without a source is just a model's guess. My pipeline always retrieves at
+least one chunk before the model runs, and the prompt requires the model to
+cite what it used. The only way this fails is if the model ignores the
+prompt, which is exactly what I want to catch. A target of 4 of 5 would let
+one uncited answer through, and one is too many for a system whose value is
+verifiability.
 
 ---
 
@@ -50,48 +60,46 @@ in at least 4 of 5 tries.
      just keep five of them, or the "4 of 5" above has nothing to be 4 of. -->
 
 **Why this target:**
-<!-- What did your distances look like when you set the cutoff in Milestone 4?
-     Was there a clean gap, or did the two groups overlap? -->
+When I ran the starter on city_guides, "what is the name of the city?" returned
+best distance 0.688, above the 0.6 cutoff, and the gate correctly refused. The
+five OUT_OF_SCOPE questions are all from entirely different domains, so their
+distances should be well above any in-corpus question. I pick 4 of 5 rather
+than 5 of 5 because one question could land just under the cutoff by
+coincidence — distance is a heuristic, not a proof — and I'd rather report an
+honest miss than pretend the gate is perfect.
 
 ---
 
-## 4. Something about your chunks
+## 4. No chunk ends mid-sentence
 
-<!-- YOU WRITE THIS ONE.
-
-     How would you know if your chunks were the right size? Name something
-     countable or observable.
-
-     Examples of the right shape — don't copy these, they should come from
-     what you actually saw in Milestone 3:
-       - "At least 4 of 5 sampled chunks read as a complete thought, with no
-          sentence cut in half at either end."
-       - "No chunk is shorter than 200 characters, since anything below that
-          in my corpus turned out to be a heading with no content under it." -->
-
-
+No chunk in my index ends mid-sentence. When I sample 5 chunks at random,
+all 5 end with a complete sentence or a section boundary.
 
 **Why this target:**
-
-
+In Milestone 1 I saw the starter chunker produce a chunk ending in "The
+station is a 15-" — a clear mid-sentence cut — and a 24-character chunk
+that was just a document tail. My chunking strategy splits on Markdown
+headings, so every chunk should end at a `##` boundary or a paragraph end.
+Any mid-sentence ending would mean my strategy failed. I pick 5 of 5 rather
+than 4 of 5 because this is a mechanical property of the splitter, not a
+quality judgment — there is no reason to allow even one failure.
 
 ---
 
-## 5. Your choice
+## 5. Sources name a specific file
 
-<!-- YOU WRITE THIS ONE TOO.
-
-     Pick something you actually care about getting right. It could be about
-     speed, about refusals, about a particular kind of question your corpus
-     handles badly, about source attribution being correct rather than merely
-     present — anything, as long as it names a number or an observable
-     outcome. -->
-
-
+Every answer's source line names a specific file (e.g. guide_seasons.md),
+not a generic reference like "the documents". When I check 3 answers,
+all 3 name a file I can open.
 
 **Why this target:**
-
-
+I care about this because grounding is only useful if a
+reader can verify it. A source line saying "the documents" is unverifiable —
+the reader can't tell which file actually contained the answer. My chunks
+carry a header prefix with the file and section name, so the model has the
+information it needs to cite precisely. I pick 3 of 3 because this is a
+formatting requirement, not a retrieval quality question — there is no
+reason the system should ever fail to name a file it retrieved from.
 
 ---
 
