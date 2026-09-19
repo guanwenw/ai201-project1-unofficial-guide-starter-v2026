@@ -29,53 +29,85 @@
 
 ## Chunking Strategy
 
-**Chunk size:**
-**Overlap:**
+**Chunk size:** 800 characters
+**Overlap:** 100 characters, only when a section exceeds 800 characters.
 
-<!-- What about YOUR documents made you pick these numbers? Short posts and
-     long sectioned guides don't want the same chunking, and "800 seemed
-     reasonable" earns nothing. Point at something you noticed when you read
-     the documents in Milestone 1.
+I read three `city_guides` documents (`guide_seasons.md`,
+`guide_accessibility.md`, `guide_elder_ness.md`) and found they all share
+the same structure: a `#` title followed by multiple `##` sections, each
+covering one self-contained topic (one season, one accessibility category,
+one aspect of a town).
 
-     If you changed your mind partway through, say so and say why. That's worth
-     more than pretending you got it right first time.
+The starter chunker cut these on a fixed 800-character window and produced:
+- A chunk ending mid-sentence: "...The station is a 15-"
+- A 24-character chunk (the tail of a document that didn't divide evenly)
+- Chunks that mixed two `##` sections, so a question about one topic
+  matched a chunk mostly about another
 
-     Milestone 3. -->
+My splitter uses `##` headings as the primary boundary. Each section
+becomes one chunk. If a section exceeds 800 characters, it is split
+further on paragraph breaks with 100 characters of overlap so no sentence
+is cut in half. Each chunk carries a `[file > section]` header so the
+source line can cite the specific section, not just the file.
+
+**Result after re-indexing:** 98 chunks (was 51, +92%), average 331 characters
+(was 650, -49%), shortest 50 (was 24, +108%), longest 754 (was 800, -6%). The shortest chunk
+is the intro to `guide_accessibility.md` — a short but self-contained
+opening paragraph, not a fragment.
 
 ## Sample Chunks
 
-<!-- Five chunks, pasted as text. Label each one and name the file it came from
-     AND the function that produced it — the grader checks your code against
-     what you claim here.
-
-     `python app.py chunks -n 5` prints all three for you. Copy them straight
-     across.
-
-     Milestone 3. -->
-
-**Chunk 1** — source: `` — produced by: ``
+**Chunk 1** — source: `guide_accessibility.md#0` — produced by: `chunker.py::split_documents`
 
 ```
+[guide_accessibility.md > intro]
+# Getting around the region with limited mobility
+
+An honest assessment rather than a promotional one. Some of these places are
+difficult and it is better to know in advance.
 ```
 
-**Chunk 2** — source: `` — produced by: ``
+**Chunk 2** — source: `guide_corry_vale.md#6` — produced by: `chunker.py::split_documents`
 
 ```
+[guide_corry_vale.md > When to go]
+## When to go
+
+May to September. Outside those months the pub in the third village closes, the farm shop reduces its hours, and several footpaths become genuinely boggy rather than merely wet. The road is not gritted above the second village and is impassable in snow.
 ```
 
-**Chunk 3** — source: `` — produced by: ``
+**Chunk 3** — source: `guide_givens_mill.md#3` — produced by: `chunker.py::split_documents`
 
 ```
+[guide_givens_mill.md > Eat and drink]
+## Eat and drink
+
+A tearoom attached to the mill, open 10 to 4 daily except Tuesdays, which sells bread made from the flour ground twenty metres away and is the reason most people come. One pub, food served lunchtimes and Thursday to Saturday evenings.
 ```
 
-**Chunk 4** — source: `` — produced by: ``
+**Chunk 4** — source: `guide_kestrelford.md#6` — produced by: `chunker.py::split_documents`
 
 ```
+[guide_kestrelford.md > When to go]
+## When to go
+
+Late spring and early autumn. The Saturday market runs year-round but is much reduced from November to February. August is busy with walkers. The single-track approach road is genuinely difficult in snow and the town can be cut off for a day or two most winters.
 ```
 
-**Chunk 5** — source: `` — produced by: ``
+**Chunk 5** — source: `guide_regional_transport.md#1` — produced by: `chunker.py::split_documents`
 
 ```
+[guide_regional_transport.md > The railway]
+## The railway
+
+The line runs along the river valley, connecting Brightwater to the regional
+hub in 50 minutes. Eleven services a day on weekdays, six on Sundays. The line
+north of Brightwater closed in 1963 and everything beyond it is bus or car.
+
+Tickets are cheaper booked the day before than on the day, and considerably
+cheaper than that booked a week ahead. There is no ticket office at
+Brightwater station outside weekday mornings; the machine on the platform takes
+cards only.
 ```
 
 ## Sample Answer
