@@ -1,6 +1,6 @@
 # The Unofficial Guide
 
-Name: Guanwen Wang Corpus: city_guides
+Guanwen Wang, city_guides
 
 > **This file is your submission.** Fill it in as you go — most sections get
 > written during the milestone that produces them, not at the end.
