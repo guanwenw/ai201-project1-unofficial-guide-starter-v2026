@@ -199,27 +199,92 @@ are refused.
 
 ## Run Log — Before
 
-<!-- Your five criteria, three runs each. `python run_eval.py --label before`
-     runs the questions, puts the OUT_OF_SCOPE ones through the gate, and
-     writes it all into results/ for you. Targets come from criteria.md; the
-     verdict column is your call.
-
-     Criterion 3 is measured in one deterministic pass rather than three, so
-     the same number goes in all three run columns. That's correct, not lazy.
-
-     Milestone 1. -->
+Three runs per criterion, caching off. Produced by `run_eval.py::main`,
+stored in `results/run_2026-09-26_1808_before.md`.
 
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunk contains the answer | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 2. Every answer names a source | 5 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 3. Gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 4. No chunk ends mid-sentence | 5 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 5. Source names a specific file | 3 of 3 | 5/5 | 5/5 | 5/5 | MET |
 
-<!-- Underneath, paste the REAL output for each criterion from one of your
-     runs — the actual text your system produced, not a description of it.
-     Name the file and function that produced it. -->
+Criteria 3 and 4 are deterministic — retrieval is a comparison against a
+fixed number and chunk boundaries do not change between runs — so the
+same number goes in all three columns. Criteria 1, 2 and 5 depend on the
+generated answer and were measured three times.
+
+### Real output
+
+Produced by `run_eval.py::main`, stored in
+`results/run_2026-09-26_1808_before.md`.
+
+**Criterion 1 — run 1:**
+
+> Question: How often do trams run in Marchwood on weekdays?
+> Best distance: 0.3251 (passed the gate)
+>
+> ```
+> In Marchwood, trams run every 8 minutes on weekdays.
+> Source: `guide_marchwood.md`
+> ```
+
+**Criterion 1 — run 1 (Elder Ness population):**
+
+> Question: What is the population of Elder Ness?
+> Best distance: 0.3717 (passed the gate)
+>
+> ```
+> The population of Elder Ness is 300 (guide_elder_ness.md).
+> ```
+
+**Criterion 2 — run 1:**
+
+> Question: What time should you arrive at Halden Bay in August?
+> Best distance: 0.3505 (passed the gate)
+>
+> ```
+> If you are going to Halden Bay in August, you should arrive before 10am.
+> Source: `guide_seasons.md` (also mentioned in `guide_regional_transport.md`
+> and `guide_halden_bay.md`).
+> ```
+
+**Criterion 3 — deterministic, one pass:**
+
+| Out-of-scope question | Best distance | Gate |
+|---|---|---|
+| What is the capital of Mongolia? | 0.887 | refused |
+| How do I change the oil in a diesel engine? | 0.897 | refused |
+| Who won the 1994 World Cup? | 0.903 | refused |
+| What is the recommended dosage of ibuprofen for a headache? | 0.829 | refused |
+| How do I write a for loop in Rust? | 0.853 | refused |
+
+Gate refused 5 of 5.
+
+**Criterion 4 — sample of 5 chunks, produced by `chunker.py::split_documents`:**
+
+```
+guide_halden_bay.md#4: ends with '...covers the fishing industry and takes 40 minutes.'
+guide_givens_mill.md#3: ends with '...food served lunchtimes and Thursday to Saturday evenings.'
+guide_marchwood.md#1: ends with '...costs more than the equivalent taxi shared between three people.'
+guide_brightwater.md#3: ends with '...earlier than visitors expect, and on Sundays many close entirely.'
+guide_eating.md#2: ends with '...the hardest meal to find anywhere except Marchwood and Thornby Wells.'
+```
+
+All 5 end with a complete sentence.
+
+**Criterion 5 — run 1:**
+
+> Question: Which town in the region is the easiest to get around with limited mobility?
+> Answer:
+>
+> ```
+> **Thornby Wells** is the easiest town in the region to get around with
+> limited mobility because it is flat, compact, and everything is within
+> three minutes of everything else.
+> Source: `guide_accessibility.md`
+> ```
 
 ## Verdicts
 
