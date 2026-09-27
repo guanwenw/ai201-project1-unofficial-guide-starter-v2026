@@ -183,40 +183,66 @@ def search(
     top_k: int | None = None,
     corpus: str | None = None,
     variant: str = "default",
+    hybrid=True
 ) -> list[Result]:
-    """
-    Retrieve the chunks closest in meaning to a question.
+    
+    from rank_bm25 import BM25Okapi
+    
+    def _tokenize(text: str) -> list[str]:
+        """Lowercase word tokenizer. Good enough for BM25 on guide text."""
+        return text.lower().split()
 
-    Returns them nearest-first, each with its distance.
-    """
+    def _rrf_merge(rankings: list[list[str]], k: int = 60) -> list[str]:
+        """
+        Reciprocal Rank Fusion over several ranked id lists.
+
+        Returns ids sorted best-first. k=60 is the standard constant from the
+        original RRF paper and works well without tuning.
+        """
+        scores: dict[str, float] = {}
+        for ranking in rankings:
+            for rank, doc_id in enumerate(ranking):
+                scores[doc_id] = scores.get(doc_id, 0.0) + 1.0 / (k + rank + 1)
+        return [doc_id for doc_id, _ in sorted(scores.items(), key=lambda x: -x[1])]
+    
     top_k = top_k or config.TOP_K
     name = config.collection_name(corpus, variant)
+    collection = _client().get_collection(name)
 
-    try:
-        collection = _client().get_collection(name)
-    except Exception as exc:
-        raise RuntimeError(
-            f"No index called '{name}'. Run `python app.py index` first."
-        ) from exc
-
+    pool = top_k * 4
     raw = collection.query(
         query_embeddings=embed([question]),
-        n_results=min(top_k, collection.count()),
+        n_results=min(pool, collection.count()),
     )
 
-    results: list[Result] = []
-    for text, meta, distance in zip(
-        raw["documents"][0], raw["metadatas"][0], raw["distances"][0]
-    ):
-        results.append(
-            Result(
-                text=text,
-                source=str(meta.get("source", "unknown")),
-                label=f"{meta.get('source', 'unknown')}#{meta.get('index', 0)}",
-                distance=float(distance),
-                produced_by=str(meta.get("produced_by", "unknown")),
-            )
-        )
+    ids = raw["ids"][0]
+    texts = raw["documents"][0]
+    metas = raw["metadatas"][0]
+    distances = raw["distances"][0]
+
+    if hybrid:
+        bm25 = BM25Okapi([_tokenize(t) for t in texts])
+        bm25_scores = bm25.get_scores(_tokenize(question))
+        # RRF over semantic rank and BM25 rank, within the pool only
+        semantic_rank = list(range(len(ids)))
+        bm25_rank = sorted(range(len(ids)), key=lambda i: -bm25_scores[i])
+        fused = _rrf_merge([
+            [ids[i] for i in semantic_rank],
+            [ids[i] for i in bm25_rank],
+        ])
+        order = [ids.index(doc_id) for doc_id in fused[:top_k]]
+    else:
+        order = list(range(top_k))
+
+    results = []
+    for i in order:
+        results.append(Result(
+            text=texts[i],
+            source=str(metas[i].get("source", "unknown")),
+            label=f"{metas[i].get('source', 'unknown')}#{metas[i].get('index', 0)}",
+            distance=float(distances[i]),
+            produced_by=str(metas[i].get("produced_by", "unknown")),
+        ))
     return results
 
 
