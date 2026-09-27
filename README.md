@@ -206,10 +206,6 @@ guessing.
 
 # Unit 2
 
-<!-- These sections get ADDED to what's already above. Don't delete or rewrite
-     unit 1 — the point is that someone can see what you said before you knew
-     how it went. -->
-
 ## Run Log — Before
 
 Three runs per criterion, caching off. Produced by `run_eval.py::main`,
