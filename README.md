@@ -288,22 +288,13 @@ All 5 end with a complete sentence.
 
 ## Verdicts
 
-<!-- MET or MISSED for each of the five, against the target you wrote last
-     unit — not a new one. Plus a sentence on how you decided. That sentence
-     matters most where it was close.
-
-     If your target said 4 of 5 and your runs came out 4, 3, 4, that's a MISS.
-     The target has to hold, not show up occasionally.
-
-     Milestone 2. -->
-
 | # | Criterion | Verdict | How I decided |
 |---|---|---|---|
-| 1 |  |  |  |
-| 2 |  |  |  |
-| 3 |  |  |  |
-| 4 |  |  |  |
-| 5 |  |  |  |
+| 1 | Retrieved chunk contains the answer | MET | All three runs produced 5/5 answers containing the `expects` keyword. Target was 4 of 5; actual was 5/5. |
+| 2 | Every answer names a source | MET | All 15 answers (5 questions × 3 runs) named at least one specific file. Target was 5 of 5; actual was 5/5. |
+| 3 | Gate stops out-of-corpus questions | MET | 5/5 out-of-scope questions refused with "I don't have enough information about that". Target was 4 of 5; actual was 5/5. |
+| 4 | No chunk ends mid-sentence | MET | All 5 sampled chunks ended with a complete sentence (a period). Target was 5 of 5; actual was 5/5. |
+| 5 | Source names a specific file | MET | All checked answers named a file I could open. Target was 3 of 3; actual was 5/5. |
 
 ## Diagnoses
 
