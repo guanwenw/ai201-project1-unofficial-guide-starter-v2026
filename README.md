@@ -298,23 +298,29 @@ All 5 end with a complete sentence.
 
 ## Diagnoses
 
-<!-- For each miss: which stage caused it, and how. The stage alone isn't
-     enough — you need the mechanism.
+I missed nothing. All five criteria were MET in every run. Per the
+brief, that means my criteria were safe rather than informative — a
+system that clears every target on the first try tells you the targets
+were set below the system's actual performance, not that the system is
+excellent.
 
-     Not a diagnosis: "Question 3 didn't work."
-     A diagnosis:     "Question 3 asks about laundry costs. The answer is in
-                       one sentence that got split across two chunks, so
-                       neither chunk on its own contains it."
+Two criteria are worth tightening:
 
-     The five stages: loading → chunking → embedding → retrieval → generation.
+- **Criterion 1** (target 4 of 5, actual 5/5 in all three runs). The
+  target cannot distinguish a system that works from one that mostly
+  works. If one question had failed, 4 of 5 would still have passed.
+  I would tighten it to 5 of 5.
+- **Criterion 3** (target 4 of 5, actual 5/5, deterministic). The
+  distance gap between my worst in-scope question (0.486) and my best
+  out-of-scope question (0.829) is 0.343 wide with no overlap, so a
+  target of 5 of 5 is realistic here.
 
-     Look for a pattern. If three misses all ask about numbers, that's one
-     problem, not three.
+Criteria 2, 4 and 5 were already at their strictest values (5 of 5,
+5 of 5, 3 of 3) and all passed. There is nothing to tighten there.
 
-     Missed nothing? Say so, then say honestly whether your targets were set
-     low, and which one you'd tighten and to what.
-
-     Milestone 3. -->
+There is no pipeline stage to diagnose because no criterion failed.
+The relevant finding is that the targets themselves were set at the
+wrong level, which is what the brief asks me to say when nothing misses.
 
 ## The Improvement
 
