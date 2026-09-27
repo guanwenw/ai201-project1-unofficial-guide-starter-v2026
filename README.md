@@ -305,6 +305,21 @@ All 5 end with a complete sentence.
 | 4 | No chunk ends mid-sentence | MET | All 5 sampled chunks ended with a complete sentence (a period). Target was 5 of 5; actual was 5/5. |
 | 5 | Source names a specific file | MET | All checked answers named a file I could open. Target was 3 of 3; actual was 5/5. |
 
+**On targets that were too safe:**
+All 5 were MET, the targets were safe rather than informative. Two of them are worth tightening:
+
+- **Criterion 1** was set at 4 of 5 and came out 5/5 in all three runs.
+  A target of 4 of 5 cannot distinguish a system that works from one that
+  mostly works — it would have passed even if one question had failed.
+  I'd tighten it to 5 of 5.
+- **Criterion 3** was set at 4 of 5 and came out 5/5 (deterministic). The
+  gap between my best in-scope distance (0.486) and my worst out-of-scope
+  distance (0.829) is 0.343 wide, so a 5 of 5 target is realistic here
+  too.
+
+Criteria 2, 4 and 5 were already set at their strictest values (5 of 5,
+5 of 5, 3 of 3) and all passed, so there is nothing to tighten there.
+
 ## Diagnoses
 
 I missed nothing. All five criteria were MET in every run. Per the
