@@ -184,6 +184,19 @@ because a round number is easier to explain and reproduce than a fitted
 one. All five in-scope questions pass and all five out-of-scope questions
 are refused.
 
+**3. Hybrid search — using AI to spot why the improvement didn't work.**
+
+After I added BM25 to `store.py::search` and re-ran the test, every
+in-scope distance came back identical to four decimal places. I asked
+Claude to look at the before and after outputs and tell me what could
+explain a change in top-5 membership with no change in top-1 distance.
+It pointed out that `best_distance` is the top-1 cosine distance, and
+that RRF can only move a chunk into the top slot if it already outranked
+the current top-1 in one of the two lists — which it didn't, because
+semantic retrieval already had the right top-1. That gave me the
+mechanism to write the "did it help?" paragraph honestly instead of
+guessing.
+
 <!-- ── Stretch features ─────────────────────────────────────────────────────
      Doing one? Say so here BEFORE you start. A feature this README never
      claims earns nothing.
@@ -381,17 +394,64 @@ test of whether hybrid search helps here.
 
 ## What's Still Broken
 
-<!-- For each criterion still missed after your fix: what you'd do about it,
-     and why you stopped where you did.
+Nothing in the system is broken. All five criteria were MET in every run
+before the improvement, and all five are still MET after it. There is no
+miss to diagnose and no fix to attempt.
 
-     "I ran out of time" is fine if it's true. Pretending nothing is left is
-     not.
+What is broken is the *level* of two of my targets, not the system:
 
-     Milestone 5. -->
+- **Criterion 1** was set at 4 of 5. It came out 5 of 5 in every run.
+  A target of 4 of 5 cannot distinguish a system that works from one
+  that mostly works — it would have passed even if one question failed.
+  The honest fix is to tighten it, not to fix the system.
+- **Criterion 3** was set at 4 of 5. It came out 5 of 5 (deterministic).
+  The distance gap between my worst in-scope question (0.486) and my
+  best out-of-scope question (0.829) is 0.343 wide with no overlap, so
+  a target of 5 of 5 is realistic here too.
+
+Criteria 2, 4 and 5 were already at their strictest values and all
+passed; there is nothing to tighten there.
+
+I stopped where I did because the brief says a target you missed stays
+where it is and gets diagnosed, but a target you *cleared too easily*
+is a different problem — it's a target-set-too-low problem, and the
+only fix is to raise it in the next unit. Raising it now would have
+meant editing criteria.md in unit 2, which the brief forbids.
 
 ## What I'd Do Differently
 
-<!-- Knowing what you know now — which of your five criteria would you write
-     differently, and why?
+Knowing what I know now, I would rewrite two of my five criteria:
 
-     Milestone 5. -->
+**Criterion 1 — raise from 4 of 5 to 5 of 5.**
+
+I set 4 of 5 to leave room for one hard question. But all three runs
+came out 5 of 5, so the room was never used. A target the system
+clears by a full question is not measuring the system — it's measuring
+whether the system is catastrophically broken. 5 of 5 would at least
+tell me when one question starts slipping.
+
+**Criterion 3 — raise from 4 of 5 to 5 of 5.**
+
+Same reason, but stronger: criterion 3 is deterministic. The gate is a
+comparison against a fixed number, and the distance gap between my two
+groups is 0.343 wide with no overlap. There is no realistic world in
+which the gate refuses 4 of 5 but not 5 of 5 on this corpus. A target
+of 4 of 5 was chosen because the brief suggested it, not because my
+corpus needed the slack.
+
+**What I would add if I had a sixth criterion.**
+
+Both my criteria 1 and 5 pass because my questions and my documents
+share vocabulary. A criterion I would add for a next unit: "For at
+least 3 of 5 questions, the answer includes the specific number the
+document states (8 minutes, 300, 10am)." That would catch a system
+that retrieves the right chunk but drops the number when it generates
+the answer — which none of my current criteria would catch, because
+the answer can be "correct" without the number.
+
+**What I would not change.**
+
+The chunking strategy. It was the single biggest improvement from
+Unit 1: it turned 51 mixed-content chunks into 98 section-aligned
+chunks, and every in-scope distance in this unit came out comfortably
+below the 0.6 cutoff. I would not touch it.
