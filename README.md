@@ -326,32 +326,58 @@ wrong level, which is what the brief asks me to say when nothing misses.
 
 **What I changed:**
 
+I added BM25 keyword retrieval to `store.py::search` and combined it with
+the existing Chroma cosine retrieval using Reciprocal Rank Fusion (RRF).
+The default is now hybrid=True; passing hybrid=False recovers the
+original semantic-only behaviour.
+
 **Why I picked it:**
 
-<!-- Connect it to a specific diagnosis above in one sentence. If you can't,
-     you picked a fix because it sounded impressive. -->
+My five test questions all contain either a proper noun (Thornby Wells,
+Elder Ness, Marchwood, Halden Bay) or a number (8 minutes, 300, 10am,
+25-minute). The brief says hybrid search "usually helps when your
+questions contain names, numbers, or exact terms that semantic search
+glides past," so I expected it to lower the distances on these questions.
 
 ### Run Log — After
 
-<!-- Same format, same five criteria, three runs each.
-     `python run_eval.py --label after` -->
-
 | Criterion | Target | Run 1 | Run 2 | Run 3 | Verdict |
 |---|---|---|---|---|---|
-| 1. Retrieved chunk contains the answer | 4 of 5 |  |  |  |  |
-| 2. Every answer names a source | 5 of 5 |  |  |  |  |
-| 3. Gate stops out-of-corpus questions | 4 of 5 |  |  |  |  |
-| 4. | | | | | |
-| 5. | | | | | |
+| 1. Retrieved chunk contains the answer | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 2. Every answer names a source | 5 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 3. Gate stops out-of-corpus questions | 4 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 4. No chunk ends mid-sentence | 5 of 5 | 5/5 | 5/5 | 5/5 | MET |
+| 5. Source names a specific file | 3 of 3 | 5/5 | 5/5 | 5/5 | MET |
 
 **Did it help?**
 
-<!-- Say plainly whether it did, and how you know. If it made things worse,
-     say that — a change that backfired, honestly reported, earns full credit
-     and is more interesting than one that worked. What matters is that you can
-     tell.
+No measurable improvement on the in-scope questions. Every best distance
+is identical to the before run, to four decimal places:
 
-     Milestone 4. -->
+| Question | Before | After |
+|---|---|---|
+| Marchwood trams | 0.3251 | 0.3251 |
+| Easiest town | 0.4855 | 0.4855 |
+| Elder Ness walk | 0.2699 | 0.2699 |
+| Elder Ness population | 0.3717 | 0.3717 |
+| Halden Bay August | 0.3505 | 0.3505 |
+
+The top-5 *membership* changed for several questions — for example,
+"Marchwood trams" now retrieves `guide_brightwater.md` instead of
+`guide_thornby_wells.md` — but because `best_distance` is the top-1
+cosine distance and the top-1 chunk was already ranked first by both
+retrievers, the number the gate reads did not move.
+
+One small positive: the out-of-scope question "Who won the 1994 World
+Cup?" moved from 0.903 to 0.993, further from the 0.6 cutoff, so the
+gate has slightly more margin on that question. I would not call this
+a meaningful improvement.
+
+The honest reading is that on this corpus, with these five questions,
+semantic retrieval was already finding the right top-1 chunk, and BM25
+had nothing to add. A version of this test where the questions used
+vocabulary that differs from the documents' wording would be a better
+test of whether hybrid search helps here.
 
 ## What's Still Broken
 
